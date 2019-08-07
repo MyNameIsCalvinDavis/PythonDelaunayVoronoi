@@ -1,6 +1,39 @@
 
 import matplotlib.pyplot as plt
 import random
+
+
+class Edge:
+	def __init__(self, p1=[0,0], p2=[0,0] ):
+		self.p1 = p1
+		self.p2 = p2
+
+class Triangle:
+	def __init__(self, p1=[0,0], p2=[0,0], p3=[0,0] ):
+		self.p1 = p1
+		self.p2 = p2
+		self.p3 = p3
+		self.points = [p1, p2, p3]
+		self.cc = [0, 0]
+		self.ccr = 0
+		
+		self.edges = [ Edge(p1, p2), Edge(p2, p3), Edge(p3, p1) ]
+		
+		self.calculatecc()
+	
+	def calculatecc(self):
+		# Sanitize
+		if ((self.p1[0] == self.p2[0] == self.p3[0]) or (self.p1[1] == self.p2[1] == self.self.p3[1])):
+			raise("Can not calculate circumcenter for points on the same line")
+			
+		
+		D = 2*( self.p1[0]*(self.p2[1] - self.p3[1])  +  self.p2[0]*(self.p3[1] - self.p1[1])  +  self.p3[0]*(self.p1[1] - self.p2[1]) )
+		self.cc[0] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p2[1] - self.p3[1]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p3[1] - self.p1[1]) + (self.p3[0]**2 + self.p3[1]**2)*(self.p1[1] - self.p2[1]) )
+		self.cc[1] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p3[0] - self.p2[0]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p1[0] - self.p3[0]) + (self.p3[0]**2 + self.p3[1]**2)*(self.p2[0] - self.p1[0]) )
+		
+		self.ccr = ( (self.p1[0] - self.cc[0])**2 + (self.p1[1] - self.cc[1])**2 )**0.5
+
+
 """
 function BowyerWatson (pointList)
       // pointList is a set of coordinates defining the points to be triangulated
@@ -27,42 +60,18 @@ function BowyerWatson (pointList)
       return triangulation
 
 """
-
-class Edge:
-	def __init__(self, p1, p2):
-		self.p1 = p1 if p1 else (0, 0)
-		self.p2 = p2 if p2 else (0, 0)
-
-class Triangle:
-	def __init__(self, p1, p2, p3 ):
-		self.p1 = p1 if p1 else (0, 0)
-		self.p2 = p2 if p2 else (0, 0)
-		self.p3 = p3 if p3 else (0, 0)
-		self.points = (p1, p2, p3)
-		self.cc = [0, 0]
-		self.ccr = 0
-		
-		
-		
-		self.calculatecc()
+def Triangulate(pointList, TR):
+	triangulation = [] # Holds triangles
 	
-	def calculatecc(self):
-		# Sanitize
-		if ((self.p1[0] == self.p2[0] == self.p3[0]) or (self.p1[1] == self.p2[1] == self.self.p3[1])):
-			raise("Can not calculate circumcenter for points on the same line")
-			
-		
-		D = 2*( self.p1[0]*(self.p2[1] - self.p3[1])  +  self.p2[0]*(self.p3[1] - self.p1[1])  +  self.p3[0]*(self.p1[1] - self.p2[1]) )
-		self.cc[0] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p2[1] - self.p3[1]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p3[1] - self.p1[1]) + (self.p3[0]**2 + self.p3[1]**2)*(self.p1[1] - self.p2[1]) )
-		self.cc[1] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p3[0] - self.p2[0]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p1[0] - self.p3[0]) + (self.p3[0]**2 + self.p3[1]**2)*(self.p2[0] - self.p1[0]) )
-		
-		self.ccr = ( (self.p1[0] - self.cc[0])**2 + (self.p1[1] - self.cc[1])**2 )**0.5
+
 
 points = [(random.randrange(100), random.randrange(100)) for x in range(50)]
 points.append((0,0))
 points.append((0, 99))
 points.append((99, 0))
 points.append((99,99))
+
+triangles = Triangulate(points)
 
 
 
