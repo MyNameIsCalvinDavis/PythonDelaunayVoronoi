@@ -27,7 +27,7 @@ function BowyerWatson (pointList)
 """
 
 class Triangle:
-	def __init__(self, p1 = (0, 0), p2 = (0, 0), p3 = (0, 0), cc = (0, 0), ccr = (0, 0) ):
+	def __init__(self, p1 = [0, 0], p2 = [0, 0], p3 = [0, 0], cc = [0, 0], ccr = 0 ):
 		self.p1 = p1
 		self.p2 = p2
 		self.p3 = p3
@@ -35,4 +35,9 @@ class Triangle:
 		self.ccr = ccr
 	
 	def calculatecc(self):
+		D = 2*( p1[0]*(p2[1] - p3[1])  +  p2[0]*(p3[1] - p1[1])  +  p3[0]*(p1[1] - p2[1]) )
+		#							   #						 #	
+		self.cc[0] = (1 / D) * ( (p1[0]**2 + p1[1]**2)*(p2[1] - p3[1]) + (p2[0]**2 + p2[1]**2)*(p3[1] - p1[1]) + (p3[0]**2 + p3[1]**2)*(p1[1] - p2[1]) )
+		self.cc[1] = (1 / D) * ( (p1[0]**2 + p1[1]**2)*(p3[0] - p2[0]) + (p2[0]**2 + p2[1]**2)*(p1[0] - p3[0]) + (p3[0]**2 + p3[1]**2)*(p2[0] - p1[0]) )
 		
+		self.ccr = ( (p1[0] - self.cc[0])**2 + (p1[1] - self.cc[1])**2 )**0.5
