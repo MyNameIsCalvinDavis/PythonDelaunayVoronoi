@@ -28,6 +28,11 @@ function BowyerWatson (pointList)
 
 """
 
+class Edge:
+	def __init__(self, p1, p2):
+		self.p1 = p1 if p1 else (0, 0)
+		self.p2 = p2 if p2 else (0, 0)
+
 class Triangle:
 	def __init__(self, p1, p2, p3 ):
 		self.p1 = p1 if p1 else (0, 0)
@@ -36,6 +41,9 @@ class Triangle:
 		self.points = (p1, p2, p3)
 		self.cc = [0, 0]
 		self.ccr = 0
+		
+		
+		
 		self.calculatecc()
 	
 	def calculatecc(self):
@@ -50,16 +58,37 @@ class Triangle:
 		
 		self.ccr = ( (self.p1[0] - self.cc[0])**2 + (self.p1[1] - self.cc[1])**2 )**0.5
 
+points = [(random.randrange(100), random.randrange(100)) for x in range(50)]
+points.append((0,0))
+points.append((0, 99))
+points.append((99, 0))
+points.append((99,99))
 
-points = [(x, y) for x in range(1,100) for y in range(1,100)]
+
+
+		
+"""
+
+
 t = Triangle(random.choice(points), random.choice(points), random.choice(points))
 
-plt.plot(t.p1[0], t.p1[1], "ro")
+plt.gcf().gca().axis("equal")
+plt.axis([0, 100, 0, 100])
+circle = plt.Circle( (t.cc[0], t.cc[1]), t.ccr, color='b', fill=False)
+poly = plt.Polygon( [[t.x[0], t.y[0]], [t.x[1], t.y[1]], [t.x[2], t.y[2]]], closed=True, ec="r")
+
+plt.plot(t.p1[0], t.p1[1], "ro") # The three points of the triangle
 plt.plot(t.p2[0], t.p2[1], "ro")
 plt.plot(t.p3[0], t.p3[1], "ro")
-plt.axis([0, 100, 0, 100])
-plt.plot(t.cc[0], t.cc[1], "bo")
-circle = plt.Circle((t.cc[0], t.cc[1]), 0.2, color='b')
-plt.plot(circle)
-plt.show()
 
+for point in points:
+	plt.plot(point[0], point[1], "o")
+
+
+plt.plot(t.cc[0], t.cc[1], "bo") # Plot the circumcenter
+
+
+plt.gcf().gca().add_artist(circle)
+plt.gcf().gca().add_artist(poly)
+plt.show()
+"""
