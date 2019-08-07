@@ -82,7 +82,6 @@ while True:# The main loop, this will run forever until stopped manually.
         # As a result I have no idea what it actually does, I just know it saves the image
         draw.polygon([tuple(x) for x in polycopy], fill=g.color_rgb(pixelsg.getPixel(int(ax), int(ay))[0], pixelsg.getPixel(int(ax), int(ay))[1], pixelsg.getPixel(int(ax), int(ay))[2]))
         triangle.draw(win)
-    print "Done!"
     saveimg.save("Output.bmp")
     time.sleep(3)
     win.close()
