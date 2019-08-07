@@ -4,12 +4,12 @@ import random
 
 
 class Edge:
-	def __init__(self, p1=[0,0], p2=[0,0] ):
+	def __init__(self, p1=(0,0), p2=(0,0) ):
 		self.p1 = p1
 		self.p2 = p2
 
 class Triangle:
-	def __init__(self, p1=[0,0], p2=[0,0], p3=[0,0] ):
+	def __init__(self, p1=(0,0), p2=(0,0), p3=(0,0) ):
 		self.p1 = p1
 		self.p2 = p2
 		self.p3 = p3
@@ -60,8 +60,13 @@ function BowyerWatson (pointList)
       return triangulation
 
 """
-def Triangulate(pointList, TR):
+def Triangulate(pointList, *args):
+	# Args is the top right point and bottom left point, respectively
+	# If args[1] is omitted, bottom left is assumed to be 0,0
+	
 	triangulation = [] # Holds triangles
+	bottom = args[1] if args[1] else [0, 0]
+	superTri = Triangle(, 
 	
 
 
@@ -71,7 +76,7 @@ points.append((0, 99))
 points.append((99, 0))
 points.append((99,99))
 
-triangles = Triangulate(points)
+triangles = Triangulate(points, (100, 100))
 
 
 
