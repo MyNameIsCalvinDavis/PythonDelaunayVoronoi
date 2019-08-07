@@ -1,6 +1,6 @@
 
 import matplotlib.pyplot as plt
-from random import random
+import random
 """
 function BowyerWatson (pointList)
       // pointList is a set of coordinates defining the points to be triangulated
@@ -52,4 +52,14 @@ class Triangle:
 
 
 points = [(x, y) for x in range(1,100) for y in range(1,100)]
-t = Triangle(points[452], points[436], points[531])
+t = Triangle(random.choice(points), random.choice(points), random.choice(points))
+
+plt.plot(t.p1[0], t.p1[1], "ro")
+plt.plot(t.p2[0], t.p2[1], "ro")
+plt.plot(t.p3[0], t.p3[1], "ro")
+plt.axis([0, 100, 0, 100])
+plt.plot(t.cc[0], t.cc[1], "bo")
+circle = plt.Circle((t.cc[0], t.cc[1]), 0.2, color='b')
+plt.plot(circle)
+plt.show()
+
