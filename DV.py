@@ -1,4 +1,6 @@
 
+import matplotlib.pyplot as plt
+from random import random
 """
 function BowyerWatson (pointList)
       // pointList is a set of coordinates defining the points to be triangulated
@@ -27,17 +29,21 @@ function BowyerWatson (pointList)
 """
 
 class Triangle:
-	def __init__(self, p1 = [0, 0], p2 = [0, 0], p3 = [0, 0], cc = [0, 0], ccr = 0 ):
-		self.p1 = p1
-		self.p2 = p2
-		self.p3 = p3
-		self.cc = cc
-		self.ccr = ccr
+	def __init__(self, p1, p2, p3 ):
+		self.p1 = p1 if p1 else (0, 0)
+		self.p2 = p2 if p2 else (0, 0)
+		self.p3 = p3 if p3 else (0, 0)
+		self.cc = [0, 0]
+		self.ccr = 0
+		self.calculatecc()
 	
 	def calculatecc(self):
-		D = 2*( p1[0]*(p2[1] - p3[1])  +  p2[0]*(p3[1] - p1[1])  +  p3[0]*(p1[1] - p2[1]) )
-		#							   #						 #	
-		self.cc[0] = (1 / D) * ( (p1[0]**2 + p1[1]**2)*(p2[1] - p3[1]) + (p2[0]**2 + p2[1]**2)*(p3[1] - p1[1]) + (p3[0]**2 + p3[1]**2)*(p1[1] - p2[1]) )
-		self.cc[1] = (1 / D) * ( (p1[0]**2 + p1[1]**2)*(p3[0] - p2[0]) + (p2[0]**2 + p2[1]**2)*(p1[0] - p3[0]) + (p3[0]**2 + p3[1]**2)*(p2[0] - p1[0]) )
+		D = 2*( self.p1[0]*(self.p2[1] - self.p3[1])  +  self.p2[0]*(self.p3[1] - self.p1[1])  +  self.p3[0]*(self.p1[1] - self.p2[1]) )
+		self.cc[0] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p2[1] - self.p3[1]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p3[1] - self.p1[1]) + (self.p3[0]**2 + self.p3[1]**2)*(self.p1[1] - self.p2[1]) )
+		self.cc[1] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p3[0] - self.p2[0]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p1[0] - self.p3[0]) + (self.p3[0]**2 + self.p3[1]**2)*(self.self.p2[0] - self.p1[0]) )
 		
 		self.ccr = ( (p1[0] - self.cc[0])**2 + (p1[1] - self.cc[1])**2 )**0.5
+
+
+points = [(x, y) for x in range(1,100) for y in range(1,100)]
+t = Triangle(points[452], points[436], points[531])
