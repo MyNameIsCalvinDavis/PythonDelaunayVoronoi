@@ -40,10 +40,19 @@ class Triangle:
 
 def findNeighbors(tri, tris):
 	nbs = []
+	tris.remove(tri)
 	for t in tris:
+		tmp = 0
 		for edge in t.edges:
-			if edge in tri.edges:
-				nbs.append(tri)
+			for ed in tri.edges:
+				if ed.equal(edge):
+					nbs.append(t)
+					tmp = 1
+					break
+			if tmp == 1:
+				break
+
+	return nbs
 
 def checkSharedEdge(ed, tris):
 	# Count how many times edge appears in tris
@@ -123,5 +132,5 @@ plt.show()
 
 # Voronoi
 for t in triangles:
-	for edge in t.edges:
-		if 
+	nbs = findNeighbors(t, triangles)
+	#print("Original: ", t.points, "\t\t\t", [x.points for x in nbs])
