@@ -40,7 +40,7 @@ class Triangle:
 
 def findNeighbors(tri, tris):
 	nbs = []
-	tris.remove(tri)
+	#tris.remove(tri)
 	for t in tris:
 		tmp = 0
 		for edge in t.edges:
@@ -102,7 +102,7 @@ def Triangulate(pointList, BL, TR):
 				
 
 
-points = [(random.randrange(100), random.randrange(100)) for x in range(100)]
+points = [(random.randrange(0,100, 10), random.randrange(0, 100, 10)) for x in range(50)]
 points.append((50,50))
 points.append((0,0))
 points.append((0,99))
@@ -114,7 +114,7 @@ triangles = Triangulate(points, (0,0), (100,100))
 plt.gcf().gca().axis("equal")
 plt.axis([0, 100, 0, 100])
 
-"""
+
 for t in triangles:
 			
 	plt.plot(t.p1[0], t.p1[1], "ro") # The three points of the triangle
@@ -127,10 +127,11 @@ for t in triangles:
 	
 	#plt.gcf().gca().add_artist(circle)
 	plt.gcf().gca().add_artist(poly)
-plt.show()
-"""
+
 
 # Voronoi
 for t in triangles:
 	nbs = findNeighbors(t, triangles)
-	#print("Original: ", t.points, "\t\t\t", [x.points for x in nbs])
+	for nb in nbs:
+		plt.plot([t.cc[0], nb.cc[0]], [t.cc[1], nb.cc[1]], "k-")
+plt.show()
