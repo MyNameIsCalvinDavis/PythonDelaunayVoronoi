@@ -7,6 +7,10 @@ class Edge:
 	def __init__(self, p1=(0,0), p2=(0,0) ):
 		self.p1 = p1
 		self.p2 = p2
+	def equal(self, edge):
+		if (self.p1 == edge.p1 or self.p1 == edge.p2 and self.p2 == edge.p2 or self.p2 == edge.p1):
+			return True
+		return False
 
 class Triangle:
 	def __init__(self, p1=(0,0), p2=(0,0), p3=(0,0) ):
@@ -19,9 +23,9 @@ class Triangle:
 		
 		self.edges = [ Edge(p1, p2), Edge(p2, p3), Edge(p3, p1) ]
 		
-		self.calculatecc()
+		self.__calculatecc()
 	
-	def calculatecc(self):
+	def __calculatecc(self):
 		# Sanitize
 		if ((self.p1[0] == self.p2[0] == self.p3[0]) or (self.p1[1] == self.p2[1] == self.self.p3[1])):
 			raise("Can not calculate circumcenter for points on the same line")
@@ -33,6 +37,15 @@ class Triangle:
 		
 		self.ccr = ( (self.p1[0] - self.cc[0])**2 + (self.p1[1] - self.cc[1])**2 )**0.5
 
+def checkSharedEdge(ed, tris):
+	# Count how many times edge appears in triangles
+	count = 0
+	for tri in tris:
+		for e in tri.edges:
+			if e.equal(ed):
+				count += 1
+	return count
+		
 
 """
 function BowyerWatson (pointList)
@@ -65,8 +78,33 @@ def Triangulate(pointList, *args):
 	# If args[1] is omitted, bottom left is assumed to be 0,0
 	
 	triangulation = [] # Holds triangles
-	bottom = args[1] if args[1] else [0, 0]
-	superTri = Triangle(, 
+	bottom = args[1] if args[1] else (0, 0) # Set a point at the relative origin of the grid
+	top = (bottom[0], 2*args[0][1]) # Set a point located 2x above the height of the grid
+	right = (2*args[0][0], bottom[1]) # Set a point located 2x to the right of the grid
+	# This creates our super triangle
+	
+	superTri = Triangle(bottom, top, right)
+	triangulation.append(superTri)
+	for point in pointList:
+		badTriangles = []
+		for triangle in triangulation:
+			if (( (point[0] - triangle.cc[0])**2 + (point[1] - triangle.cc[1])**2 )**0.5) < triangle.ccr:
+				badTriangles.append(triangle)
+		polygon = []
+		for triangle in badTriangles:
+			for edge in triangle.edges:
+				if checkSharedEdge(edge, badTriangles) == 1:
+					polygon.append(edge)
+		for triangle in badTriangles:
+			triangulation.remove(triangle)
+		for edge in polygon:
+			newTri = Triangle((edge.p1[0], edge.p1[1]), (edge.p2[0], edge.p2[1]), (point[0], point[1]))
+			triangulation.append(newTri)
+	for tri in triangulation:
+		if (bottom in tri.points or top in tri.points or right in tri.points):
+			triangulation.remove(tri)
+	return triangulation
+				
 	
 
 
@@ -76,7 +114,7 @@ points.append((0, 99))
 points.append((99, 0))
 points.append((99,99))
 
-triangles = Triangulate(points, (100, 100))
+triangles = Triangulate(points, (100, 100), (0, 0))
 
 
 
