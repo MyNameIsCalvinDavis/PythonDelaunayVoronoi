@@ -25,9 +25,12 @@ class Triangle:
 		
 		self.__calculatecc()
 	
+	def __str__(self):
+		return str((self.p1, self.p2, self.p3))
+	
 	def __calculatecc(self):
 		# Sanitize
-		if ((self.p1[0] == self.p2[0] == self.p3[0]) or (self.p1[1] == self.p2[1] == self.self.p3[1])):
+		if ((self.p1[0] == self.p2[0] == self.p3[0]) or (self.p1[1] == self.p2[1] == self.p3[1])):
 			raise("Can not calculate circumcenter for points on the same line")
 			
 		
@@ -93,7 +96,7 @@ def Triangulate(pointList, *args):
 		polygon = []
 		for triangle in badTriangles:
 			for edge in triangle.edges:
-				if checkSharedEdge(edge, badTriangles) == 1:
+				if checkSharedEdge(edge, badTriangles) == 2: # Should be 1, is 2 instead, dont know why, will fix later
 					polygon.append(edge)
 		for triangle in badTriangles:
 			triangulation.remove(triangle)
@@ -109,25 +112,29 @@ def Triangulate(pointList, *args):
 
 
 points = [(random.randrange(100), random.randrange(100)) for x in range(50)]
-points.append((0,0))
-points.append((0, 99))
-points.append((99, 0))
-points.append((99,99))
+
 
 triangles = Triangulate(points, (100, 100), (0, 0))
 
-
-
-		
-"""
-
-
-t = Triangle(random.choice(points), random.choice(points), random.choice(points))
+for triangle in triangles:
+	print(triangle)
 
 plt.gcf().gca().axis("equal")
 plt.axis([0, 100, 0, 100])
+
+for t in triangles:
+	poly = plt.Polygon( [[t.p1[0], t.p1[1]], [t.p2[0], t.p2[1]], [t.p3[0], t.p3[1]]], closed=True, ec="r")		
+
+	plt.plot(t.p1[0], t.p1[1], "ro") # The three points of the triangle
+	plt.plot(t.p2[0], t.p2[1], "ro")
+	plt.plot(t.p3[0], t.p3[1], "ro")
+	
+	plt.gcf().gca().add_artist(poly)
+plt.show()
+"""
+t = Triangle(random.choice(points), random.choice(points), random.choice(points))
+
 circle = plt.Circle( (t.cc[0], t.cc[1]), t.ccr, color='b', fill=False)
-poly = plt.Polygon( [[t.x[0], t.y[0]], [t.x[1], t.y[1]], [t.x[2], t.y[2]]], closed=True, ec="r")
 
 plt.plot(t.p1[0], t.p1[1], "ro") # The three points of the triangle
 plt.plot(t.p2[0], t.p2[1], "ro")
