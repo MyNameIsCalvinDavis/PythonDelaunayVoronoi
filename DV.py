@@ -5,10 +5,14 @@ import random
 
 class Edge:
 	def __init__(self, p1=(0,0), p2=(0,0) ):
-		self.p1 = p1
-		self.p2 = p2
+		if p1 < p2:
+			self.p1 = p1
+			self.p2 = p2
+		else:
+			self.p1 = p2
+			self.p2 = p1
 	def equal(self, edge):
-		if (self.p1 == edge.p1 or self.p1 == edge.p2 and self.p2 == edge.p2 or self.p2 == edge.p1):
+		if (self.p1 == edge.p1 and self.p2 == edge.p2):
 			return True
 		return False
 
@@ -31,7 +35,7 @@ class Triangle:
 	def __calculatecc(self):
 		# Sanitize
 		if ((self.p1[0] == self.p2[0] == self.p3[0]) or (self.p1[1] == self.p2[1] == self.p3[1])):
-			raise("Can not calculate circumcenter for points on the same line")
+			raise Exception("Can not calculate circumcenter for points on the same line")
 			
 		
 		D = 2*( self.p1[0]*(self.p2[1] - self.p3[1])  +  self.p2[0]*(self.p3[1] - self.p1[1])  +  self.p3[0]*(self.p1[1] - self.p2[1]) )
@@ -48,6 +52,9 @@ def checkSharedEdge(ed, tris):
 			if e.equal(ed):
 				count += 1
 	return count
+
+def distance(p1, p2):
+	return ( (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )**0.5
 		
 
 """
@@ -76,14 +83,14 @@ function BowyerWatson (pointList)
       return triangulation
 
 """
-def Triangulate(pointList, *args):
+def Triangulate(pointList, BL, TR):
 	# Args is the top right point and bottom left point, respectively
 	# If args[1] is omitted, bottom left is assumed to be 0,0
 	
 	triangulation = [] # Holds triangles
-	bottom = args[1] if args[1] else (0, 0) # Set a point at the relative origin of the grid
-	top = (bottom[0], 2*args[0][1]) # Set a point located 2x above the height of the grid
-	right = (2*args[0][0], bottom[1]) # Set a point located 2x to the right of the grid
+	bottom = (BL[0]-10, BL[1]-10) # Set a point at the relative origin of the grid
+	top = (BL[0]-10, 2*TR[1]+10) # Set a point located 2x above the height of the grid
+	right = (2*TR[0]+10, BL[1]-10) # Set a point located 2x to the right of the grid
 	# This creates our super triangle
 	
 	superTri = Triangle(bottom, top, right)
@@ -91,33 +98,41 @@ def Triangulate(pointList, *args):
 	for point in pointList:
 		badTriangles = []
 		for triangle in triangulation:
-			if (( (point[0] - triangle.cc[0])**2 + (point[1] - triangle.cc[1])**2 )**0.5) < triangle.ccr:
+			if distance(point, triangle.cc) < triangle.ccr:
 				badTriangles.append(triangle)
 		polygon = []
 		for triangle in badTriangles:
 			for edge in triangle.edges:
-				if checkSharedEdge(edge, badTriangles) == 2: # Should be 1, is 2 instead, dont know why, will fix later
+				if checkSharedEdge(edge, badTriangles) == 1: # Should be 1, is 2 instead, dont know why, will fix later
 					polygon.append(edge)
 		for triangle in badTriangles:
 			triangulation.remove(triangle)
 		for edge in polygon:
-			newTri = Triangle((edge.p1[0], edge.p1[1]), (edge.p2[0], edge.p2[1]), (point[0], point[1]))
-			triangulation.append(newTri)
+			try:
+				newTri = Triangle((edge.p1[0], edge.p1[1]), (edge.p2[0], edge.p2[1]), (point[0], point[1]))
+				triangulation.append(newTri)
+			except:
+				continue
+	cleanup = []
 	for tri in triangulation:
-		if (bottom in tri.points or top in tri.points or right in tri.points):
-			triangulation.remove(tri)
-	return triangulation
+		if not (bottom in tri.points or top in tri.points or right in tri.points):
+			cleanup.append(tri)
+	return cleanup
 				
 	
 
 
-points = [(random.randrange(100), random.randrange(100)) for x in range(50)]
+points = [(random.randrange(100), random.randrange(100)) for x in range(100)]
+points.append((50,50))
+points.append((0,0))
+points.append((0,99))
+points.append((99,0))
+points.append((99,99))
 
+for p in points:
+	plt.plot(p[0], p[1], "o")
 
-triangles = Triangulate(points, (100, 100), (0, 0))
-
-for triangle in triangles:
-	print(triangle)
+triangles = Triangulate(points, (0,0), (100,100))
 
 plt.gcf().gca().axis("equal")
 plt.axis([0, 100, 0, 100])
