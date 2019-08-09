@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import random
+import math
 
 class Edge:
 	def __init__(self, p1=(0,0), p2=(0,0) ):
@@ -102,12 +103,15 @@ def Triangulate(pointList, BL, TR):
 				
 
 
-points = [(random.randrange(0,100, 10), random.randrange(0, 100, 10)) for x in range(50)]
+points = [(random.randrange(0,100), random.randrange(0, 100)) for x in range(50)]
+
 points.append((50,50))
 points.append((0,0))
 points.append((0,99))
 points.append((99,0))
 points.append((99,99))
+
+
 
 triangles = Triangulate(points, (0,0), (100,100))
 
@@ -121,13 +125,13 @@ for t in triangles:
 	plt.plot(t.p2[0], t.p2[1], "ro")
 	plt.plot(t.p3[0], t.p3[1], "ro")
 	plt.plot(t.cc[0], t.cc[1], "bo")
-	
+	"""
 	circle = plt.Circle( (t.cc[0], t.cc[1]), t.ccr, color='b', fill=False)
 	poly = plt.Polygon( [[t.p1[0], t.p1[1]], [t.p2[0], t.p2[1]], [t.p3[0], t.p3[1]]], closed=True, ec="r")
 	
 	#plt.gcf().gca().add_artist(circle)
 	plt.gcf().gca().add_artist(poly)
-
+"""
 
 # Voronoi
 for t in triangles:
