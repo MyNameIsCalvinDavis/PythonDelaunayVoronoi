@@ -4,7 +4,7 @@ while True:
     win = g.GraphWin("Delaunay Triangulation", 1300,1000)
     choices = [("I-" + str(x) + ".png") for x in range(0, 37)]
     img = random.choice(choices)
-    img = "I-9.gif"
+    img = "Example.gif"
     pixelsg = g.Image(g.Point(0,0), img);copy = pixelsg;width, height = copy.getWidth(), copy.getHeight();pixelsg = g.Image(g.Point(width/2, height/2), img);saveimg = Image.new("RGB", (1000,1000), "white");draw = ImageDraw.Draw(saveimg);p, blacklist = np.array([[0, 0], [0, height], [width, 0], [width, height]]), []
     for i in range(600):
         x, y = random.choice(range(0, width, 30)), random.choice(range(0, height, 30))

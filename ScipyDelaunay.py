@@ -1,33 +1,21 @@
 from scipy.spatial import Delaunay
 import numpy as np
 import random
-import PIL
 import PIL.Image as Image
-from PIL import ImageTk
 import graphics as g
 import time
 import PIL.ImageDraw as ImageDraw
 
-lastimg = [5, "P-2.png"] # Used so the same image isnt used twice. 5 is a placeholder.
-
-while True:# The main loop, this will run forever until stopped manually.
+while True:
     win = g.GraphWin("Delaunay Triangulation", 1200,1000) # The grid
-    #choices = ["I-" + str(x) + ".png" for x in range(0, 20)] # The pictures
-    
+
     """
     Python 2.7's tkinter doesn't like dealing with png files
     so instead of downloading a bunch of single frame gif files
     i've decided instead to do nothing
     """
-    
-    #img = random.choice(choices)
-    img = "I-9.gif"
-    
-    """
-    if img in lastimg:
-        continue
-    lastimg[0] = img
-    """
+
+    img = "Example.gif"
     
     saveimg = Image.new("RGB", (1000,1000), "white")
     draw = ImageDraw.Draw(saveimg)
@@ -42,7 +30,7 @@ while True:# The main loop, this will run forever until stopped manually.
 
     p = np.array([[0, 0], [0, height], [width, 0], [width, height]])# The list in which the points go
     blacklist = []
-    for i in range(500): # Randomize the points on a plane
+    for i in range(2000): # Randomize the points on a plane
         x = random.choice(range(0, width, 5))
         y = random.choice(range(0, height, 5))
         if [x, y] not in blacklist: # Dont repeat any points
