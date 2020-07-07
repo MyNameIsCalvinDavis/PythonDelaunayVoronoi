@@ -1,77 +1,72 @@
 from scipy.spatial import Delaunay
 import numpy as np
 import random
-import PIL.Image as Image
-import graphics as g
-import time
-import PIL.ImageDraw as ImageDraw
+from PIL import Image
+from PIL import ImageDraw
 
-while True:
-    win = g.GraphWin("Delaunay Triangulation", 1200,1000) # The grid
+class Triangles:
+    def __init__(self, refImg, numPoints):
+        self.refImg = refImg
+        self.refImg = Image.open(refImg)
+        self.w, self.h = self.refImg.size
 
-    """
-    Python 2.7's tkinter doesn't like dealing with png files
-    so instead of downloading a bunch of single frame gif files
-    i've decided instead to do nothing
-    """
+        # Create some points randomly
+        self.p = self._initPoints(numPoints)
 
-    img = "Example.gif"
-    
-    saveimg = Image.new("RGB", (1000,1000), "white")
-    draw = ImageDraw.Draw(saveimg)
-    
-    pixelsg = g.Image(g.Point(0,0), img)
-    copy = pixelsg
-    width, height = copy.getWidth(), copy.getHeight() # Gets the width and height of the image
-    pixelsg = g.Image(g.Point(width/2, height/2), img)
-    #pixelsg.draw(win)
-    time.sleep(1)
-    
+        # Triangluate them
+        self.tri = Delaunay(self.p)
 
-    p = np.array([[0, 0], [0, height], [width, 0], [width, height]])# The list in which the points go
-    blacklist = []
-    for i in range(2000): # Randomize the points on a plane
-        x = random.choice(range(0, width, 5))
-        y = random.choice(range(0, height, 5))
-        if [x, y] not in blacklist: # Dont repeat any points
+        # print("Points: ", self.p)                  # Generated points w/ numpy
+        # print("DPoints: ", self.tri.points)        # Scipy.Delaunay's points, identical to above
+        # print("Simplices: ", self.tri.simplices)   # Object's indexed indices from tri.points
+
+        self.simplexPoints = self._getSimplexPoints(self.tri)
+
+        # print(l)          # List of simplices
+        # print(l[0])       # A simplex
+        # print(l[0][0])    # A point
+
+    def __exit__(self, exc_type, exc_val, exc_tb): # How do python destructors work again?
+        self.refImg.close()
+
+    def triangulateImage(self):
+        with Image.new("RGB", self.refImg.size, (0,0,0)) as newImg:
+            draw = ImageDraw.Draw(newImg)
+            self._drawPolygons(self.simplexPoints, draw)
+            newImg.save("Output.png", "BMP")
+
+    def _getSimplexPoints(self, triangle):  # Because the triangle object only stores indices for some reason
+        return [(
+            tuple(triangle.points[simplex[0]]),
+            tuple(triangle.points[simplex[1]]),
+            tuple(triangle.points[simplex[2]])
+        ) for simplex in triangle.simplices]
+
+    def _calculateTriangleCenter(self, simplex):
+        return (
+            (simplex[0][0] + simplex[1][0] + simplex[2][0]) / 3,
+            (simplex[0][1] + simplex[1][1] + simplex[2][1]) / 3
+        )
+
+    def _drawPolygons(self, points, draw): #
+        for simplex in points:
+            centerPixel = self._calculateTriangleCenter(simplex)
+            color = self.refImg.getpixel(centerPixel)
+            draw.polygon(simplex, fill=color, outline=color)
+
+    def _initPoints(self, num):
+        p = np.array([[0, 0], [0, self.h], [self.w, 0], [self.w, self.h]])  # Includes 4 corners
+        for i in range(num):  # Randomize the points on a plane
+            x = random.choice(range(0, self.w, 5))
+            y = random.choice(range(0, self.h, 5))
             p = np.vstack([p, [x, y]])
-            blacklist.append([x, y])
-    tri = Delaunay(p)
+        return p
 
-    simplexVIs = [] # "Simplex Vertex indices"
-    for simplex in tri.vertices:
-        simplexVIs.append(simplex) # Not important
+a = Triangles("Example.png", 200)
+a.triangulateImage()
 
-    simplexVs = [] # "Simplex Vertices"
-    for vertexTriplet in simplexVIs: # Grab the vertices of every simplex and add to a list
-        templist = []
-        for vertex in vertexTriplet:
-            templist.append(tri.points[vertex])
-        simplexVs.append(templist) # Get the 3 vertices that make the triangle
-        
 
-    for simplex in simplexVs:# iterate through every triangle
-        poly = []
-        for vertex in simplex: # Keep in mind vertex is an X, Y pair
-            poly.append([vertex[0], vertex[1]])
-        polycopy = poly[::]
-        # Now we have the polygon
-        ax = (poly[0][0] + poly[1][0] + poly[2][0]) * (1.0/3)
-        ay = (poly[0][1] + poly[1][1] + poly[2][1]) * (1.0/3) # The center of the triangle
-        rgb = pixelsg.getPixel(int(ax), int(ay)) # The color at the center of the triangle
-        for item in range(len(poly)):# Turning the vertices into points that the graph can understand
-            poly[item] = g.Point(poly[item][0], poly[item][1])
-        triangle = g.Polygon(poly) # Plotting the triangle
-        triangle.setFill(g.color_rgb(rgb[0], rgb[1], rgb[2]))
-        triangle.setOutline(g.color_rgb(rgb[0], rgb[1], rgb[2]))
-        
-        # I actually stole this line from another version of this code that is much more condensed
-        # Because i used to like to try to fit code into as few lines as possible
-        # As a result I have no idea what it actually does, I just know it saves the image
-        draw.polygon([tuple(x) for x in polycopy], fill=g.color_rgb(pixelsg.getPixel(int(ax), int(ay))[0], pixelsg.getPixel(int(ax), int(ay))[1], pixelsg.getPixel(int(ax), int(ay))[2]))
-        triangle.draw(win)
-    saveimg.save("Output.bmp")
-    time.sleep(3)
-    win.close()
-    
-    break
+
+
+
+
