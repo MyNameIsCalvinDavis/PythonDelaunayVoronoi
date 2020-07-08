@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import random
-import math
 
 class Edge:
 	def __init__(self, p1=(0,0), p2=(0,0) ):
@@ -19,7 +18,6 @@ class Triangle:
 		self.points = [p1, p2, p3]
 		self.cc = [0, 0]
 		self.ccr = 0
-		
 		self.edges = [ Edge(p1, p2), Edge(p2, p3), Edge(p3, p1) ]
 		
 		self.__calculatecc()
@@ -27,12 +25,12 @@ class Triangle:
 	def __str__(self):
 		return str((self.p1, self.p2, self.p3))
 	
-	def __calculatecc(self):
+	def __calculatecc(self): # Calculate circumcenter
 		# Sanitize
 		if ((self.p1[0] == self.p2[0] == self.p3[0]) or (self.p1[1] == self.p2[1] == self.p3[1])):
 			raise Exception("Can not calculate circumcenter for points on the same line")
 			
-		
+		# Stolen directly from wikipedia
 		D = 2*( self.p1[0]*(self.p2[1] - self.p3[1])  +  self.p2[0]*(self.p3[1] - self.p1[1])  +  self.p3[0]*(self.p1[1] - self.p2[1]) )
 		self.cc[0] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p2[1] - self.p3[1]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p3[1] - self.p1[1]) + (self.p3[0]**2 + self.p3[1]**2)*(self.p1[1] - self.p2[1]) )
 		self.cc[1] = (1 / D) * ( (self.p1[0]**2 + self.p1[1]**2)*(self.p3[0] - self.p2[0]) + (self.p2[0]**2 + self.p2[1]**2)*(self.p1[0] - self.p3[0]) + (self.p3[0]**2 + self.p3[1]**2)*(self.p2[0] - self.p1[0]) )
@@ -40,8 +38,11 @@ class Triangle:
 		self.ccr = ( (self.p1[0] - self.cc[0])**2 + (self.p1[1] - self.cc[1])**2 )**0.5
 
 def findNeighbors(tri, tris):
+	"""
+	Return a list of neighbors in a Delaunay Triangulation
+	for a tri given the list of tris it occupies
+	"""
 	nbs = []
-	#tris.remove(tri)
 	for t in tris:
 		tmp = 0
 		for edge in t.edges:
@@ -68,14 +69,44 @@ def distance(p1, p2):
 	return ( (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )**0.5
 		
 
-def Triangulate(pointList, BL, TR):
+def Triangulate(pointList):
+	"""
+	:param pointList: [(x,y), (x,y), ...] where points > 0
+	:return: A list of Triangle objects
+
+	Implementation of the Bowyer-Watson triangulation
+	"""
+
+	BL = ( # Find the bottom left most point
+		min(pointList, key = lambda x: x[0])[0] + 1,
+		min(pointList, key = lambda x: x[1])[1] + 1
+	)
+	TR = ( # Find the top right most point
+		max(pointList, key=lambda x: x[0])[0] + 1,
+		max(pointList, key=lambda x: x[1])[1] + 1
+	)
+
+	# These points are added to simulate infinity for the voronoi dual graph
+	ins = 7 # infinity scale factor
+	pointList.append((  TR[0]*ins, TR[1]*ins  )) 	# TR
+	pointList.append((  TR[0]*ins, TR[1]*(-ins) )) 	# BR
+	pointList.append((  TR[0]*(-ins), TR[1]*(-ins) ))# BL
+	pointList.append((  TR[0]*(-ins), TR[1]*ins ))	# TL
+
+
+
 	triangulation = [] # Holds triangles
-	bottom = (BL[0]-10, BL[1]-10) # Set a point at the relative origin of the grid
-	top = (BL[0]-10, 2*TR[1]+10) # Set a point located 2x above the height of the grid
-	right = (2*TR[0]+10, BL[1]-10) # Set a point located 2x to the right of the grid
-	# This creates our super triangle
+	s = 50 # super triangle scale factor
+	# If this scale factor is not properly larger than the infinity scale factor,
+	# the super triangle will not encapsulate the infinity points correctly and the circumcenter
+	# for the infinity points will b
+
+	# Create the 3 points for our super triangle, must also encapsulate infinity points
+	st_bl = (  TR[0]*(-s), TR[1]*(-s)  )
+	st_tl = (  TR[0]*(-s), TR[1]*s)
+	st_r = (  TR[0]*s, TR[1] / 2)
 	
-	superTri = Triangle(bottom, top, right)
+	superTri = Triangle(st_bl, st_tl, st_r)
 	triangulation.append(superTri)
 	for point in pointList:
 		badTriangles = []
@@ -97,7 +128,7 @@ def Triangulate(pointList, BL, TR):
 				continue
 	cleanup = []
 	for tri in triangulation:
-		if not (bottom in tri.points or top in tri.points or right in tri.points):
+		if not (st_bl in tri.points or st_tl in tri.points or st_r in tri.points):
 			cleanup.append(tri)
 	return cleanup
 				
@@ -105,15 +136,11 @@ def Triangulate(pointList, BL, TR):
 
 points = [(random.randrange(0,100), random.randrange(0, 100)) for x in range(50)]
 
-points.append((50,50))
-points.append((0,0))
-points.append((0,99))
-points.append((99,0))
-points.append((99,99))
 
 
 
-triangles = Triangulate(points, (0,0), (100,100))
+
+triangles = Triangulate(points)
 
 plt.gcf().gca().axis("equal")
 plt.axis([0, 100, 0, 100])

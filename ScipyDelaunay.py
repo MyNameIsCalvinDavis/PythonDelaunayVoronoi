@@ -42,6 +42,9 @@ class DelaunayTriangulation:
         except Exception as e:
             print(e)
 
+    def getNeighbors(self):
+        return self.tri.neighbors
+
     def _getSimplexPoints(self, triangle):  # Because the triangle object only stores indices for some reason
         return [(
             tuple(triangle.points[simplex[0]]),
@@ -69,8 +72,9 @@ class DelaunayTriangulation:
             p = np.vstack([p, [x, y]])
         return p
 
-a = DelaunayTriangulation("Example.png", 200)
+a = DelaunayTriangulation("Example.png", 1)
 a.triangulateImage()
+print(a.getNeighbors())
 
 
 
