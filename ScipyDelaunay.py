@@ -4,9 +4,8 @@ import random
 from PIL import Image
 from PIL import ImageDraw
 
-class Triangles:
+class DelaunayTriangulation:
     def __init__(self, refImg, numPoints):
-        self.refImg = refImg
         self.refImg = Image.open(refImg)
         self.w, self.h = self.refImg.size
 
@@ -22,9 +21,9 @@ class Triangles:
 
         self.simplexPoints = self._getSimplexPoints(self.tri)
 
-        # print(l)          # List of simplices
-        # print(l[0])       # A simplex
-        # print(l[0][0])    # A point
+        # print(simplexPoints)          # List of simplices
+        # print(simplexPoints[0])       # A simplex
+        # print(simplexPoints[0][0])    # A point
 
     def __exit__(self, exc_type, exc_val, exc_tb): # How do python destructors work again?
         self.refImg.close()
@@ -35,6 +34,14 @@ class Triangles:
             self._drawPolygons(self.simplexPoints, draw)
             newImg.save("Output.png", "BMP")
 
+    def setImage(self, img):
+        self.refImg.close()
+        self.refImg = None # Just in case
+        try:
+            self.refImg = Image.open(img)
+        except Exception as e:
+            print(e)
+
     def _getSimplexPoints(self, triangle):  # Because the triangle object only stores indices for some reason
         return [(
             tuple(triangle.points[simplex[0]]),
@@ -42,7 +49,7 @@ class Triangles:
             tuple(triangle.points[simplex[2]])
         ) for simplex in triangle.simplices]
 
-    def _calculateTriangleCenter(self, simplex):
+    def _calculateTriangleCenter(self, simplex): # Who ne
         return (
             (simplex[0][0] + simplex[1][0] + simplex[2][0]) / 3,
             (simplex[0][1] + simplex[1][1] + simplex[2][1]) / 3
@@ -62,7 +69,7 @@ class Triangles:
             p = np.vstack([p, [x, y]])
         return p
 
-a = Triangles("Example.png", 200)
+a = DelaunayTriangulation("Example.png", 200)
 a.triangulateImage()
 
 
