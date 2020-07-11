@@ -1,4 +1,4 @@
-# PythonDelaunay
+# PythonDelaunayVoronoi
 Implement the Voronoi Diagram and Delaunay Triangulation from scratch for people who aren't PHD academics to be able to understand (like myself)
 
 # Goals
