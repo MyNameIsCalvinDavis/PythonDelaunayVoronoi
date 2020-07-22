@@ -5,6 +5,7 @@ Implement the Voronoi Diagram and Delaunay Triangulation from scratch for people
 * Create a workable data structure for the Delaunay Triangulation & Voronoi Diagram
 * Implement the Voronoi Diagram in a way that doesn't use Fortune's Algorithm
 * Provide a way for people to do these things without looking through research papers
+* Create two implementations, one with our home brewed code, and one made by real programmers and compare each
 
 **DV.py** - The "From Scratch" implementation\
 **ScipyDelaunay.py** - Conceptual way to do things with libraries that already exist\
