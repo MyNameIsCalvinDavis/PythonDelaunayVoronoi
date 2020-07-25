@@ -7,7 +7,7 @@ Implement the Voronoi Diagram and Delaunay Triangulation from scratch for people
 * Provide a way for people to do these things without looking through research papers
 
 **DV.py** - The "From Scratch" Delaunay & Voronoi classes\
-**ImageManipulator.py** - Implementation of DV.py
+**ImageManipulator.py** - Implementation of DV.py\
 **ScipyDelaunay.py** - Conceptual way to do things with libraries that already exist\
 **EdgeDetector.py** - Implementation of the canny edge detection algorithm\
 
