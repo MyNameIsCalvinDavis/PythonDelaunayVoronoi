@@ -6,6 +6,10 @@ import os
 import EdgeDetector as ed
 
 def calculateCenter(simplex):
+    """
+    :param simplex: [(x, y), ...]
+    :return: (x, y)
+    """
     x = []
     y = []
     for point in simplex:
@@ -18,6 +22,12 @@ def calculateCenter(simplex):
     return ((x, y))
 
 def getSimplexPoints(ob):
+    """
+    Convert scipy.spatial.Delaunay or Voronoi vertices from indices to their actual points
+
+    :param ob: A voronoi or delaunay object from scipy.spatial
+    :return: [ [(x, y), (x, y), ...] , [(x, y), ...], ... ]
+    """
     try:
         var = ob.regions # Voronoi
         pts = ob.vertices
@@ -43,6 +53,24 @@ def getSimplexPoints(ob):
             # Weird index error caused by extra regions? Lets just ignore it
     return sp
 
+def edgeDetect(image, numpts):
+    """
+    Implementation of the canny edge detector
+
+    :param image: A filename
+    :param numpts: An int
+    :return: A greyscale 2D numpy array representing an image
+    """
+    iname = os.path.join(os.path.dirname(__file__), "Images/" + image)
+    canny = ed.canny(iname, low=2, high=5, sigma=5, kernel_size=15)
+    p = []
+    for ir, row in enumerate(canny):
+        for ic, col in enumerate(row):
+            if col > 200:
+                p.append((ic, ir))
+
+    return random.choices(p, k=numpts)
+
 class DelaunayTriangulation:
     """
     Wrapper class for scipy.spatial to edit images
@@ -65,41 +93,19 @@ class DelaunayTriangulation:
     def __exit__(self, exc_type, exc_val, exc_tb): # How do python destructors work again?
         self.refImg.close()
 
-    def _edgeDetect(self):
-        """
-        Implements the canny edge detector, used to sample points
-        """
-        iname = os.path.join(os.path.dirname(__file__), "Images/" + self.refImgStr)
-
-        canny = ed.canny(iname, low=2, high=5, sigma=5, kernel_size=15)
-
-        p = []
-        for ir, row in enumerate(canny):
-            for ic, col in enumerate(row):
-                if col > 200:
-                    p.append((ic, ir))
-
-        return random.choices(p, k=self.numPoints)
-
     def calculateImage(self):
         with Image.new("RGB", self.refImg.size, (30,0,0)) as newImg:
             draw = ImageDraw.Draw(newImg)
             self._drawPolygons(self.simplexPoints, draw)
             newImg.save("Output.bmp", "BMP")
 
-    def setImage(self, img):
-        self.refImg.close()
-        self.refImg = None # Just in case
-        try:
-            self.refImgStr = img
-            self.refImg = Image.open(img)
-            self.p = self._initPoints(self.numPoints)
-            self.tri = Delaunay(self.p)
-            self.simplexPoints = getSimplexPoints(self.tri)
-        except Exception as e:
-            print(e)
+    def _drawPolygons(self, points, draw):
+        """
+        Uses PIL (Pillow) to draw an image to a draw object
 
-    def _drawPolygons(self, points, draw): #
+        :param points: [ [(x, y), (x, y), ...] , [(x, y), ...], ... ]
+        :param draw: PIL ImageDraw object
+        """
         for simplex in points:
             centerPixel = calculateCenter(simplex)
             try:
@@ -116,7 +122,7 @@ class DelaunayTriangulation:
     def _initPoints(self, num):
 
         if self.edgeDetect:
-            return self._edgeDetect()
+            return edgeDetect(self.refImgStr, self.numPoints)
         else:
             p = np.array([[0, 0], [0, self.h], [self.w, 0], [self.w, self.h]])  # Includes 4 corners
             for i in range(num):  # Randomize the points on a plane
@@ -141,41 +147,14 @@ class VoronoiDiagram:
         self.vor = Voronoi(self.p, qhull_options="Qbb Qc Qx")
         self.simplexPoints = getSimplexPoints(self.vor)
 
-
-
     def __exit__(self, exc_type, exc_val, exc_tb): # How do python destructors work again?
         self.refImg.close()
-
-    def _edgeDetect(self):
-        iname = os.path.join(os.path.dirname(__file__), "Images/" + self.refImgStr)
-
-        canny = ed.canny(iname, low=2, high=5, sigma=5, kernel_size=15)
-
-        p = []
-        for ir, row in enumerate(canny):
-            for ic, col in enumerate(row):
-                if col > 200:
-                    p.append((ic, ir))
-
-        return random.choices(p, k=self.numPoints)
 
     def calculateImage(self):
         with Image.new("RGB", self.refImg.size, (30,0,0)) as newImg:
             draw = ImageDraw.Draw(newImg)
             self._drawPolygons(self.simplexPoints, draw)
             newImg.save("Output.bmp", "BMP")
-
-    def setImage(self, img):
-        self.refImg.close()
-        self.refImg = None # Just in case
-        try:
-            self.refImgStr = img
-            self.refImg = Image.open(img)
-            self.p = self._initPoints(self.numPoints)
-            self.vor = Voronoi(self.p)
-            self.simplexPoints = getSimplexPoints(self.vor)
-        except Exception as e:
-            print(e)
 
     def _drawPolygons(self, points, draw):
         for simplex in points:
@@ -195,7 +174,7 @@ class VoronoiDiagram:
     def _initPoints(self, num):
 
         if self.edgeDetect:
-            return self._edgeDetect()
+            return edgeDetect(self.refImgStr, self.numPoints)
         else:
             p = np.array([[0, 0], [0, self.h], [self.w, 0], [self.w, self.h]])  # Includes 4 corners
             for i in range(num):  # Randomize the points on a plane
