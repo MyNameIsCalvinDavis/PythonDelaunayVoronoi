@@ -39,8 +39,9 @@ I originally made the mistake of assuming that the Voronoi implementation (of sc
 | | d(points) | colored |
 | Delaunay | ![DelaunayCircle](readme/DelaunayCircle.bmp) | ![DelaunayCircleColor](readme/DelaunayCircleColor.bmp) | | |
 
-
-
+See also:
+http://www.geom.uiuc.edu/~samuelp/del_project.html#algorithms
+http://www.cs.cmu.edu/afs/andrew/scs/cs/15-463/2001/pub/src/a2/quadedge.html
 
 ![Original](https://i.vgy.me/7PI5X6.gif)
 ![Low Poly](https://i.imgur.com/bpbsTKh.png)
