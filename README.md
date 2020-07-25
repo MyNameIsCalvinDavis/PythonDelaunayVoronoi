@@ -34,10 +34,11 @@ I originally made the mistake of assuming that the Voronoi implementation (of sc
 | | | | | |
 | --- | --- | --- | --- | --- |
 | Original | ![Circle](Images/Circle.jpg) |
-| | v(points) | colored | v(v(points)) | colored |
-| Voronoi | ![VoronoiCircle](readme/VoronoiCircle.bmp) | ![VoronoiCircleColor](readme/VoronoiCircleColor.bmp)| ![Voronoi2Circle](readme/Voronoi2Circle.bmp) | ![Voronoi2Circle2Color](readme/Voronoi2CircleColor.bmp) |
 | | d(points) | colored |
 | Delaunay | ![DelaunayCircle](readme/DelaunayCircle.bmp) | ![DelaunayCircleColor](readme/DelaunayCircleColor.bmp) | | |
+| | v(points) | colored | v(v(points)) | colored |
+| Voronoi | ![VoronoiCircle](readme/VoronoiCircle.bmp) | ![VoronoiCircleColor](readme/VoronoiCircleColor.bmp)| ![Voronoi2Circle](readme/Voronoi2Circle.bmp) | ![Voronoi2Circle2Color](readme/Voronoi2CircleColor.bmp) |
+
 
 See also:
 http://www.geom.uiuc.edu/~samuelp/del_project.html#algorithms
