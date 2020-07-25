@@ -5,11 +5,11 @@ Implement the Voronoi Diagram and Delaunay Triangulation from scratch for people
 * Create a workable data structure for the Delaunay Triangulation & Voronoi Diagram
 * Implement the Voronoi Diagram in a way that doesn't use Fortune's Algorithm
 * Provide a way for people to do these things without looking through research papers
-* Create two implementations, one with our home brewed code, and one made by real programmers and compare each
 
-**DV.py** - The "From Scratch" implementation\
+**DV.py** - The "From Scratch" Delaunay & Voronoi classes\
+**ImageManipulator.py** - Implementation of DV.py
 **ScipyDelaunay.py** - Conceptual way to do things with libraries that already exist\
-**ScipyDelaunayCompressed.py** - Garbage I wrote 6 years ago that should be avoided
+**EdgeDetector.py** - Implementation of the canny edge detection algorithm\
 
 # How it works
 The delaunay triangulation is easy enough to calculate with the Bowyer Watson algorithm, which I have included in **DV.py**. You can find the algorithm here: https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm. This is certainly not the fastest way to implement this algorithm, but it gets the job done.
@@ -26,7 +26,21 @@ Each Voronoi cell has one point inside of it, the node, which is a vertex from y
 
 This is at least ***O(n<sup>2</sup>)*** compared to Fortune's ***O(nlogn)***. There have been attempts to create data structures for the Voronoi Diagram which can reside in more complicated space, either 3D or non-euclidian, a famous example being Guibas and Stolfi's quad-edge structure that has stronger applications in computational geometry. I dont think this code works for 3D data, though it could probably be modified to do so easily.
 
-Do note that computing the Voronoi Diagram produces a new list of points, so if you want a VD for the initial list of points, you'll then need to compute a second voronoi diagram given the list of voronoi vertices.
+I originally made the mistake of assuming that the Voronoi implementation (of scipy.spatial and DV.py) would return
+ the original list of input points to be used as the region vertices, like the Delaunay Triangulation. This is
+  incorrect, and to do so you need to create a second Voronoi Diagram with the first diagram's region vertices as its
+   input.
+
+| | | | | |
+| --- | --- | --- | --- | --- |
+| Original | ![Circle](Images/Circle.jpg) |
+||
+| | v(points) | colored | v(v(points) | colored |
+| Voronoi | ![VoronoiCircle](readme/VoronoiCircle.bmp) | ![VoronoiCircleColor](readme/VoronoiCircleColor.bmp)| ![Voronoi2Circle](readme/Voronoi2Circle.bmp) | ![Voronoi2Circle2Color](readme/Voronoi2CircleColor.bmp) |
+||
+| | d(points) | colored |
+| Delaunay | ![DelaunayCircle](readme/DelaunayCircle.bmp) | ![DelaunayCircleColor](readme/DelaunayCircleColor.bmp) | | |
+
 
 
 

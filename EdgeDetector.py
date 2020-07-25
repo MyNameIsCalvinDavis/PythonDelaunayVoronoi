@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
+from scipy import signal
+import os
 
 # Code adapted from
 # adeveloperdiary.com/data-science/computer-vision/applying-gaussian-smoothing-to-an-image-using-python-from-scratch/
@@ -48,12 +50,13 @@ def gaussian_kernel(size, sigma=1, verbose=False):
 
     return kernel_2D
 
-def gaussian_blur(image, kernel_size, sigma=2, verbose=False):
+def gaussian_blur(image, kernel_size, sigma=2, verbose=False, optimize=True):
     kernel = gaussian_kernel(kernel_size, sigma=sigma, verbose=verbose)
+    if optimize:
+        return signal.convolve2d(image, kernel)
     return convolve(image, kernel, average=True, verbose=verbose)
 
 def gradient_magnitude_direction(image, verbose=False):
-    verbose=True
     # Using a scharr kernel
     scharr = np.array([
         [47, 162, 47],
@@ -205,21 +208,34 @@ def hysteresis(image, weak=100, verbose=False):
 
     return final_image
 
-def canny(imagestr, verbose=False, megaVerbose=False):
+def canny(imagestr, verbose=False, megaVerbose=False,
+          kernel_size=15, sigma=5,
+          low=2, high=5,
+          size=None, optimize=True): # size = (x, y)
 
     image = Image.open(imagestr)
-    #image = image.resize((200, 200))
+    if size:
+        image = image.resize(size)
     image = image.convert("L")
 
     y = np.asarray(image.getdata(), dtype=np.float64).reshape(image.size[1], image.size[0])
 
-    blur = gaussian_blur(y, 2, verbose=megaVerbose)
+    blur = gaussian_blur(y, kernel_size=kernel_size, sigma=sigma, verbose=megaVerbose)
     mag, d = gradient_magnitude_direction(blur, verbose=megaVerbose)
     nms = non_max_suppression(mag, d, verbose=megaVerbose)
-    thr = threshold(nms, 10, 40, verbose=megaVerbose)
+    thr = threshold(nms, low, high, verbose=megaVerbose)
     hys = hysteresis(thr, verbose=megaVerbose)
 
+    im = Image.fromarray(np.asarray(hys, dtype=np.uint8), mode="L")
+
+    # Crop away the padded edge
+    amt = kernel_size // 2
+    im = im.crop( (0 + amt, 0 + amt, im.size[0] - amt, im.size[1] - amt) )
+    hys = hys[amt:-amt, amt:-amt]
+
+    im.save("EdgeDetector.png", "PNG")
     image.close()
+    im.close()
 
     if verbose:
         fig, axs = plt.subplots(2, 3)
@@ -242,7 +258,12 @@ def canny(imagestr, verbose=False, megaVerbose=False):
 
 if __name__ == '__main__':
 
-    canny("Valve.png", True)
+    impath = os.path.join(os.path.dirname(__file__), "Images/Valve.png")
+
+    a = canny(impath, False, kernel_size=11, sigma=4, low = 20, high = 40)
+
+    # plt.imshow(a, cmap="gray")
+    # plt.show()
 
 
 

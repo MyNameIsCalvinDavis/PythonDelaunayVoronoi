@@ -47,9 +47,9 @@ def findNeighbors(tri, tris):
 
 class Triangle:
 	def __init__(self, p1, p2, p3):
-		self.p1 = p1
-		self.p2 = p2
-		self.p3 = p3
+		self.p1 = tuple(p1)
+		self.p2 = tuple(p2)
+		self.p3 = tuple(p3)
 		self.points = [p1, p2, p3]
 		self.cc = [0, 0]
 		self.ccr = 0
@@ -236,31 +236,8 @@ class VoronoiCell:
 		return stack
 
 
-
-
-
-				
-
-
-points = [(random.randrange(0,2000, 3), random.randrange(0, 2000, 3)) for x in range(1000)]
-
-# points = [
-# 	(1, 1),
-# 	(3, 1),
-# 	(4, 2),
-# 	(3, 5),
-# 	(2, 4),
-# 	(1, 3)
-# ]
-
-# plt.gcf().gca().axis("equal")
-#plt.axis([-50, 50, -50, 50])
-plt.autoscale(enable=True)
-
-v = Voronoi(points)
-
-def plotVoronoiRegions():
-	for simplex in v.simplices:
+def plotVoronoiRegions(ob):
+	for simplex in ob.simplices:
 
 		x = [i[0] for i in simplex.pointList]
 		y = [i[1] for i in simplex.pointList]
@@ -272,8 +249,8 @@ def plotVoronoiRegions():
 	plt.show()
 		#break
 
-def plotTriangles():
-	for t in v.triangles:
+def plotTriangles(ob):
+	for t in ob.triangles:
 		plt.plot(t.p1[0], t.p1[1], "ro") # The three points of the triangle
 		plt.plot(t.p2[0], t.p2[1], "ro")
 		plt.plot(t.p3[0], t.p3[1], "ro")
@@ -284,6 +261,11 @@ def plotTriangles():
 
 	plt.show()
 
-#plotTriangles()
-plotVoronoiRegions()
+
+if __name__ == "__main__":
+	points = [(random.randrange(0, 2000, 3), random.randrange(0, 2000, 3)) for x in range(1000)]
+	plt.autoscale(enable=True)
+	v = Voronoi(points)
+	#plotTriangles()
+	plotVoronoiRegions(v)
 
