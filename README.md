@@ -9,7 +9,7 @@ Implement the Voronoi Diagram and Delaunay Triangulation from scratch for people
 **DV.py** - The "From Scratch" Delaunay & Voronoi classes\
 **ImageManipulator.py** - Implementation of DV.py\
 **ScipyDelaunay.py** - Conceptual way to do things with libraries that already exist\
-**EdgeDetector.py** - Implementation of the canny edge detection algorithm\
+**EdgeDetector.py** - Implementation of the canny edge detection algorithm
 
 # How it works
 The delaunay triangulation is easy enough to calculate with the Bowyer Watson algorithm, which I have included in **DV.py**. You can find the algorithm here: https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm. This is certainly not the fastest way to implement this algorithm, but it gets the job done.
@@ -34,10 +34,8 @@ I originally made the mistake of assuming that the Voronoi implementation (of sc
 | | | | | |
 | --- | --- | --- | --- | --- |
 | Original | ![Circle](Images/Circle.jpg) |
-||
-| | v(points) | colored | v(v(points) | colored |
+| | v(points) | colored | v(v(points)) | colored |
 | Voronoi | ![VoronoiCircle](readme/VoronoiCircle.bmp) | ![VoronoiCircleColor](readme/VoronoiCircleColor.bmp)| ![Voronoi2Circle](readme/Voronoi2Circle.bmp) | ![Voronoi2Circle2Color](readme/Voronoi2CircleColor.bmp) |
-||
 | | d(points) | colored |
 | Delaunay | ![DelaunayCircle](readme/DelaunayCircle.bmp) | ![DelaunayCircleColor](readme/DelaunayCircleColor.bmp) | | |
 
